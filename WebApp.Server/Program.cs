@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Server.Data;
 
@@ -13,7 +12,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseInMemoryDatabase("AppDb"));
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddIdentityApiEndpoints<WebAppUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 var app = builder.Build();
@@ -36,6 +35,6 @@ app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
 
-app.MapIdentityApi<IdentityUser>();
+app.MapIdentityApi<WebAppUser>();
 
 app.Run();
