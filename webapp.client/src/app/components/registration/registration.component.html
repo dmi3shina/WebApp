@@ -1,0 +1,84 @@
+<mat-stepper orientation="vertical" [linear]="true" #stepper>
+  <mat-step [stepControl]="companyDataFormGroup" label="Fill out your company data">
+    <form [formGroup]="companyDataFormGroup" class="vertical-container">
+        <mat-form-field>
+          <mat-label>Company name</mat-label>
+          <input matInput placeholder="Company name" formControlName="companyName" required>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Industry</mat-label>
+          <mat-select [(value)]="selectedIndustry" required>
+            @for (industry of industries; track industry) {
+            <mat-option [value]="industry.value">{{industry.viewValue}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      <div>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="userDataFormGroup" label="Fill out your personal data">
+    <form [formGroup]="userDataFormGroup" class="vertical-container">
+      <mat-form-field>
+        <mat-label>First name</mat-label>
+        <input matInput placeholder="First name" formControlName="firstName" required>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Last name</mat-label>
+        <input matInput placeholder="Last name" formControlName="lastName" required>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>User name</mat-label>
+        <input matInput placeholder="Create a unique user name (login)" formControlName="username" required>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Password</mat-label>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+        <button mat-icon-button matSuffix (click)="togglePasswordVisibility($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Password repetition</mat-label>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="passwordRepetition">
+        <button mat-icon-button matSuffix (click)="togglePasswordVisibility($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>E-Mail</mat-label>
+        <input matInput placeholder="ex.: user@domain.com" [formControl]="email" (blur)="updateErrorMessage()">
+        @if (email.invalid) {
+        <mat-error>{{errorMessage}}</mat-error>
+        }
+      </mat-form-field>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="summaryFormGroup" label="Summary">
+    <form [formGroup]="summaryFormGroup">
+      <section class="summary-section">
+        <mat-checkbox class="checkbox-margin">I agree to terms of service</mat-checkbox>
+        <mat-checkbox class="checkbox-margin">I agree to privacy policy</mat-checkbox>
+      </section>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button (click)="registerUser()" mat-stroked-button color="accent">Register</button>
+      </div>
+    </form>
+  </mat-step>
+
+  <mat-step label="Result">
+    <p>You are now done.</p>
+    <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button (click)="stepper.reset()">Reset</button>
+    </div>
+  </mat-step>
+</mat-stepper>
