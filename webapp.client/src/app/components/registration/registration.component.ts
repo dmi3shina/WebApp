@@ -1,14 +1,13 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import { merge } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
 import { RegistrationService } from '../../services/registration.service';
 
@@ -44,6 +43,9 @@ export class RegistrationComponent {
   router = inject(Router);
   selectedIndustry = '';
   hidePassword = true;
+  emailValidationError = '';
+  registrationSucceeded = false;
+  errors: string[] = [];
 
   industries: Industry[] = [
     { value: '0', viewValue: 'IT' },
@@ -61,46 +63,61 @@ export class RegistrationComponent {
     username: ['', Validators.required],
     password: ['', Validators.required],
     passwordRepetition: ['', Validators.required],
+    email: ['', Validators.email],
   });
-
-  email = new FormControl('', [Validators.email]);
-
-  errorMessage = '';
 
   summaryFormGroup = this._formBuilder.group({
   });
+
+  constructor(private _formBuilder: FormBuilder, private _snackBar: MatSnackBar) {
+  }
 
   togglePasswordVisibility(event: MouseEvent) {
     this.hidePassword = !this.hidePassword;
     event.stopPropagation();
   }
 
-  constructor(private _formBuilder: FormBuilder) {
-    merge(this.email.statusChanges, this.email.valueChanges)
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => this.updateErrorMessage());
+  updateEmailValidationError() {
+    if (this.userDataFormGroup.get('email')?.hasError('email')) {
+      this.emailValidationError = 'Not a valid email';
+    } else {
+      this.emailValidationError = '';
+    }
   }
 
-  updateErrorMessage() {
-    if (this.email.hasError('email')) {
-      this.errorMessage = 'Not a valid email';
-    } else {
-      this.errorMessage = '';
-    }
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action);
   }
 
   registerUser() {
     if (this.companyDataFormGroup.valid && this.userDataFormGroup.valid) {
-      console.log(this.companyDataFormGroup.value);
-      console.log(this.userDataFormGroup.value);
       this.registrationService.register(this.userDataFormGroup.value)
-        .subscribe({
-          next: (data: any) => {
-            console.log(data);
-            this.router.navigate(['.']);
-          },
-          error: (err) => console.log(err)
-        });
+        .forEach(
+          response => {
+            if (response) {
+              this.registrationSucceeded = true;
+              this.openSnackBar("Registration succeeded", "Ok");
+            }
+          }).catch(
+            error => {
+              this.registrationSucceeded = false;
+              this.errors = [];
+              if (error.error) {
+                const errorObj = JSON.parse(error.error);
+                if (errorObj && errorObj.errors) {
+                  const errorList = errorObj.errors;
+                  for (let err in errorList) {
+                    if (Object.hasOwn(errorList, err)) {
+                      let errList: string[] = errorList[err];
+                      for (let i = 0; i < errList.length; i++) {
+                        this.errors.push(errList[i]);
+                      }
+                      this.openSnackBar(this.errors.join(" "), "Ok");
+                    }
+                  }
+                }
+              }
+            });
     }
   }
 }

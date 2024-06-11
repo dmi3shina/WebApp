@@ -49,9 +49,9 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>E-Mail</mat-label>
-        <input matInput placeholder="ex.: user@domain.com" [formControl]="email" (blur)="updateErrorMessage()">
-        @if (email.invalid) {
-        <mat-error>{{errorMessage}}</mat-error>
+        <input matInput placeholder="ex.: user@domain.com" formControlName="email" (blur)="updateEmailValidationError()">
+        @if (emailValidationError) {
+        <mat-error>{{emailValidationError}}</mat-error>
         }
       </mat-form-field>
       <div>
