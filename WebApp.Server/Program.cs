@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Server.Data;
 
@@ -10,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseInMemoryDatabase("AppDb"));
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<WebAppUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();

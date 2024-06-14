@@ -6,6 +6,7 @@ namespace WebApp.Server.Data
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public string? Login { get; set; }
         public string? CompanyName { get; set; }
         public int IndustryId { get; set; }
     }

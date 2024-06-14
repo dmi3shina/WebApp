@@ -60,7 +60,7 @@ export class RegistrationComponent {
   userDataFormGroup = this._formBuilder.group({
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
-    username: ['', Validators.required],
+    login: ['', Validators.required],
     password: ['', Validators.required],
     passwordRepetition: ['', Validators.required],
     email: ['', Validators.email],
