@@ -36,6 +36,6 @@ app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
 
-app.MapIdentityApi<WebAppUser>();
+app.MapWebAppIdentityApi<WebAppUser>();
 
 app.Run();
