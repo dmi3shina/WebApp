@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using WebApp.Server.Data;
 
 namespace Microsoft.AspNetCore.Routing;
 
@@ -55,7 +56,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
         // NOTE: We cannot inject UserManager<TUser> directly because the TUser generic parameter is currently unsupported by RDG.
         // https://github.com/dotnet/aspnetcore/issues/47338
         routeGroup.MapPost("/register", async Task<Results<Ok, ValidationProblem>>
-            ([FromBody] RegisterRequest registration, HttpContext context, [FromServices] IServiceProvider sp) =>
+            ([FromBody] WebAppRegisterRequest registration, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
 
@@ -67,15 +68,51 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             var userStore = sp.GetRequiredService<IUserStore<TUser>>();
             var emailStore = (IUserEmailStore<TUser>)userStore;
             var email = registration.Email;
-
-            if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
-            {
-                return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
-            }
+            var userName = registration.UserName;
 
             var user = new TUser();
-            await userStore.SetUserNameAsync(user, email, CancellationToken.None);
-            await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+
+            if (string.IsNullOrEmpty(registration.FirstName.Trim()))
+            {
+                Dictionary<string, string[]> err = new() { { "RequiredFieldEmpty", ["First name must not be empty"] } };
+                return TypedResults.ValidationProblem(err);
+            }
+            var propertyFirstName = user.GetType().GetProperty("FirstName");
+            propertyFirstName?.SetValue(user, registration.FirstName);
+
+            if (string.IsNullOrEmpty(registration.LastName.Trim()))
+            {
+                Dictionary<string, string[]> err = new() { { "RequiredFieldEmpty", ["Last name must not be empty"] } };
+                return TypedResults.ValidationProblem(err);
+            }
+            var propertyLastName = user.GetType().GetProperty("LastName");
+            propertyLastName?.SetValue(user, registration.LastName);
+
+            if (string.IsNullOrEmpty(registration.CompanyName.Trim()))
+            {
+                Dictionary<string, string[]> err = new() { { "RequiredFieldEmpty", ["Company name must not be empty"] } };
+                return TypedResults.ValidationProblem(err);
+            }
+            var propertyCompanyName = user.GetType().GetProperty("CompanyName");
+            propertyCompanyName?.SetValue(user, registration.CompanyName);
+
+            if (!string.IsNullOrEmpty(userName))
+            {
+                await userStore.SetUserNameAsync(user, userName, CancellationToken.None);
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                if (_emailAddressAttribute.IsValid(email))
+                {
+                    await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+                }
+                else
+                {
+                    return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
+                }
+            }
+
             var result = await userManager.CreateAsync(user, registration.Password);
 
             if (!result.Succeeded)
@@ -83,7 +120,6 @@ public static class IdentityApiEndpointRouteBuilderExtensions
                 return CreateValidationProblem(result);
             }
 
-            await SendConfirmationEmailAsync(user, userManager, context, email);
             return TypedResults.Ok();
         });
 

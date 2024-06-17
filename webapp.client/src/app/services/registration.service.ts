@@ -11,8 +11,12 @@ export class RegistrationService {
 
   public register(data: any) {
     return this.http.post('/register', {
-      email: data.email,
-      password: data.password
+      firstName: data.firstName,
+      lastName: data.lastName,
+      companyName: data.companyName,
+      userName: data.userName,
+      password: data.password,
+      email: data.email
     }, {
       observe: 'response',
       responseType: 'text'

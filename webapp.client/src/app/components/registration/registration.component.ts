@@ -60,7 +60,7 @@ export class RegistrationComponent {
   userDataFormGroup = this._formBuilder.group({
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
-    login: ['', Validators.required],
+    userName: ['', Validators.required],
     password: ['', Validators.required],
     passwordRepetition: ['', Validators.required],
     email: ['', Validators.email],
@@ -91,7 +91,7 @@ export class RegistrationComponent {
 
   registerUser() {
     if (this.companyDataFormGroup.valid && this.userDataFormGroup.valid) {
-      this.registrationService.register(this.userDataFormGroup.value)
+      this.registrationService.register({ ...this.companyDataFormGroup.value, ...this.userDataFormGroup.value })
         .forEach(
           response => {
             if (response) {

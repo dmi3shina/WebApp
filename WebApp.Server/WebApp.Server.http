@@ -10,7 +10,11 @@ Content-Type: application/json
 Accept: */*
 
 {
-    "email": "user@domain.com",
-    "password": "pa$$w0rD"
+    "companyName": "companyName",
+    "firstName": "firstName",
+    "lastName": "lastName",
+    "userName": "username",
+    "password": "pa$$w0rD",
+    "email": ""
 }
 ###
