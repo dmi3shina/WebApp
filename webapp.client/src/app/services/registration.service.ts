@@ -3,6 +3,15 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Industry } from '../models/industry';
 
+export interface User {
+  companyName: string;
+  industryId: number;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  password: string;
+  email: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -15,16 +24,8 @@ export class RegistrationService {
     return this.http.get<Industry[]>('/industries');
   }
 
-  public register(data: any) {
-    return this.http.post('/register', {
-      companyName: data.companyName,
-      industryId: data.selectedIndustryId,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      userName: data.userName,
-      password: data.password,
-      email: data.email
-    }, {
+  public register(user: User) {
+    return this.http.post('/register', user, {
       observe: 'response',
       responseType: 'text'
     })

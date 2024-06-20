@@ -11,6 +11,7 @@ Accept: */*
 
 {
     "companyName": "companyName",
+    "industryId": "1",
     "firstName": "firstName",
     "lastName": "lastName",
     "userName": "username",

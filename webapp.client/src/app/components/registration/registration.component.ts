@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
-import { RegistrationService } from '../../services/registration.service';
+import { User, RegistrationService } from '../../services/registration.service';
 import { Industry } from '../../models/industry';
 
 /**
@@ -45,7 +45,7 @@ export class RegistrationComponent implements OnInit {
 
   companyDataFormGroup = this._formBuilder.group({
     companyName: ['', Validators.required],
-    selectedIndustryId: ['', Validators.required],
+    industryId: [0, Validators.required],
   });
 
   userDataFormGroup = this._formBuilder.group({
@@ -60,7 +60,9 @@ export class RegistrationComponent implements OnInit {
   summaryFormGroup = this._formBuilder.group({
   });
 
-  constructor(private _formBuilder: FormBuilder, private _snackBar: MatSnackBar) {
+  constructor(
+    private _formBuilder: FormBuilder,
+    private _snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
@@ -96,9 +98,32 @@ export class RegistrationComponent implements OnInit {
     this._snackBar.open(message, action);
   }
 
+  showErrorList(error: any): any {    
+    this.errors = [];
+    if (error.error) {
+      const errorObj = JSON.parse(error.error);
+      if (errorObj && errorObj.errors) {
+        const errorList = errorObj.errors;
+        for (let err in errorList) {
+          if (Object.hasOwn(errorList, err)) {
+            let errList: string[] = errorList[err];
+            for (let i = 0; i < errList.length; i++) {
+              this.errors.push(errList[i]);
+            }
+            this.showNotification(this.errors.join(" "), "Ok");
+          }
+        }
+      }
+    }
+  }
+
   registerUser() {
     if (this.companyDataFormGroup.valid && this.userDataFormGroup.valid) {
-      this.registrationService.register({ ...this.companyDataFormGroup.value, ...this.userDataFormGroup.value })
+      const newUser: User = {
+        ...this.companyDataFormGroup.value,
+        ...this.userDataFormGroup.value
+      } as User;
+      this.registrationService.register(newUser)
         .forEach(
           response => {
             if (response) {
@@ -108,23 +133,8 @@ export class RegistrationComponent implements OnInit {
           }).catch(
             error => {
               this.registrationSucceeded = false;
-              this.errors = [];
-              if (error.error) {
-                const errorObj = JSON.parse(error.error);
-                if (errorObj && errorObj.errors) {
-                  const errorList = errorObj.errors;
-                  for (let err in errorList) {
-                    if (Object.hasOwn(errorList, err)) {
-                      let errList: string[] = errorList[err];
-                      for (let i = 0; i < errList.length; i++) {
-                        this.errors.push(errList[i]);
-                      }
-                      this.showNotification(this.errors.join(" "), "Ok");
-                    }
-                  }
-                }
-              }
+              this.showErrorList(error);
             });
     }
-  }
+  }    
 }
