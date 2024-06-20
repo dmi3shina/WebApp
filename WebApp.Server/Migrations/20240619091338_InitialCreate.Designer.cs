@@ -12,7 +12,7 @@ using WebApp.Server.Data;
 namespace WebApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240617133230_InitialCreate")]
+    [Migration("20240619091338_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -158,6 +158,39 @@ namespace WebApp.Server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("WebApp.Server.Data.Industry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IndustryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Industies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IndustryName = "IT"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IndustryName = "Automotive"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IndustryName = "Healthcare"
+                        });
+                });
+
             modelBuilder.Entity("WebApp.Server.Data.WebAppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -224,6 +257,8 @@ namespace WebApp.Server.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IndustryId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -283,6 +318,15 @@ namespace WebApp.Server.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("WebApp.Server.Data.WebAppUser", b =>
+                {
+                    b.HasOne("WebApp.Server.Data.Industry", null)
+                        .WithMany()
+                        .HasForeignKey("IndustryId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

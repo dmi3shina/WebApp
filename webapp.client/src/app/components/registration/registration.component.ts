@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,11 +10,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
 import { RegistrationService } from '../../services/registration.service';
-
-interface Industry {
-  value: string;
-  viewValue: string;
-}
+import { Industry } from '../../models/industry';
 
 /**
  * @title Registration
@@ -38,23 +34,18 @@ interface Industry {
   ],
 })
 
-export class RegistrationComponent {
+export class RegistrationComponent implements OnInit {
   registrationService = inject(RegistrationService);
   router = inject(Router);
-  selectedIndustry = '';
   hidePassword = true;
   emailValidationError = '';
   registrationSucceeded = false;
   errors: string[] = [];
-
-  industries: Industry[] = [
-    { value: '0', viewValue: 'IT' },
-    { value: '1', viewValue: 'Automotive' },
-    { value: '2', viewValue: 'Healthcare' },
-  ];
+  industries: Industry[] = [];
 
   companyDataFormGroup = this._formBuilder.group({
     companyName: ['', Validators.required],
+    selectedIndustryId: ['', Validators.required],
   });
 
   userDataFormGroup = this._formBuilder.group({
@@ -72,6 +63,22 @@ export class RegistrationComponent {
   constructor(private _formBuilder: FormBuilder, private _snackBar: MatSnackBar) {
   }
 
+  ngOnInit() {
+    this.getIndustries();
+  }
+
+  getIndustries() {
+    this.registrationService.getIndustries()
+      .subscribe({
+        next: industries => {
+          this.industries = industries;
+        },
+        error: error => {
+          console.error(error);
+        }
+    });
+  }
+
   togglePasswordVisibility(event: MouseEvent) {
     this.hidePassword = !this.hidePassword;
     event.stopPropagation();
@@ -85,7 +92,7 @@ export class RegistrationComponent {
     }
   }
 
-  openSnackBar(message: string, action: string) {
+  showNotification(message: string, action: string) {
     this._snackBar.open(message, action);
   }
 
@@ -96,7 +103,7 @@ export class RegistrationComponent {
           response => {
             if (response) {
               this.registrationSucceeded = true;
-              this.openSnackBar("Registration succeeded", "Ok");
+              this.showNotification("Registration succeeded", "Ok");
             }
           }).catch(
             error => {
@@ -112,7 +119,7 @@ export class RegistrationComponent {
                       for (let i = 0; i < errList.length; i++) {
                         this.errors.push(errList[i]);
                       }
-                      this.openSnackBar(this.errors.join(" "), "Ok");
+                      this.showNotification(this.errors.join(" "), "Ok");
                     }
                   }
                 }

@@ -7,9 +7,9 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>Industry</mat-label>
-          <mat-select [(value)]="selectedIndustry" required>
+          <mat-select formControlName="selectedIndustryId" required>
             @for (industry of industries; track industry) {
-            <mat-option [value]="industry.value">{{industry.viewValue}}</mat-option>
+            <mat-option [value]="industry.id">{{industry.industryName}}</mat-option>
             }
           </mat-select>
         </mat-form-field>

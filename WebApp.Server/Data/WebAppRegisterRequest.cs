@@ -5,6 +5,7 @@
         public WebAppRegisterRequest() { }
 
         public required string CompanyName { get; init; }
+        public required int IndustryId { get; init; }
         public required string FirstName { get; init; }
         public required string LastName { get; init; }
         public required string UserName { get; init; }

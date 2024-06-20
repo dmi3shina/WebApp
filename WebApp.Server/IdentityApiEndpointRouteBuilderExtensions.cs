@@ -72,6 +72,22 @@ public static class IdentityApiEndpointRouteBuilderExtensions
 
             var user = new TUser();
 
+            if (string.IsNullOrEmpty(registration.CompanyName.Trim()))
+            {
+                Dictionary<string, string[]> err = new() { { "RequiredFieldEmpty", ["Company name must not be empty"] } };
+                return TypedResults.ValidationProblem(err);
+            }
+            var propertyCompanyName = user.GetType().GetProperty("CompanyName");
+            propertyCompanyName?.SetValue(user, registration.CompanyName);
+
+            if (registration.IndustryId <= 0)
+            {
+                Dictionary<string, string[]> err = new() { { "RequiredFieldEmpty", ["Industry must be selected"] } };
+                return TypedResults.ValidationProblem(err);
+            }
+            var propertyIndustryId = user.GetType().GetProperty("IndustryId");
+            propertyIndustryId?.SetValue(user, registration.IndustryId);
+
             if (string.IsNullOrEmpty(registration.FirstName.Trim()))
             {
                 Dictionary<string, string[]> err = new() { { "RequiredFieldEmpty", ["First name must not be empty"] } };
@@ -87,15 +103,7 @@ public static class IdentityApiEndpointRouteBuilderExtensions
             }
             var propertyLastName = user.GetType().GetProperty("LastName");
             propertyLastName?.SetValue(user, registration.LastName);
-
-            if (string.IsNullOrEmpty(registration.CompanyName.Trim()))
-            {
-                Dictionary<string, string[]> err = new() { { "RequiredFieldEmpty", ["Company name must not be empty"] } };
-                return TypedResults.ValidationProblem(err);
-            }
-            var propertyCompanyName = user.GetType().GetProperty("CompanyName");
-            propertyCompanyName?.SetValue(user, registration.CompanyName);
-
+                        
             if (!string.IsNullOrEmpty(userName))
             {
                 await userStore.SetUserNameAsync(user, userName, CancellationToken.None);
