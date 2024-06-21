@@ -1,12 +1,14 @@
-.mat-mdc-form-field {
-  margin-top: 16px;
-}
-
 .vertical-container {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  min-width: 400px;
+}
+.checkboxes-section {
+  margin: 16px;
 }
 
-mat-checkbox {
-    margin: 16px 0;
+.result {
+  margin-top: 16px;
+  color: white;
 }

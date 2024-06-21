@@ -1,13 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, viewChild, ViewChild } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatStepperModule } from '@angular/material/stepper';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterModule } from '@angular/router';
 import { User, RegistrationService } from '../../services/registration.service';
 import { Industry } from '../../models/industry';
@@ -23,6 +25,7 @@ import { Industry } from '../../models/industry';
   imports: [
     MatButtonModule,
     MatStepperModule,
+    MatStepper,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -30,18 +33,24 @@ import { Industry } from '../../models/industry';
     MatSelectModule,
     MatIconModule,
     MatCheckboxModule,
+    MatExpansionModule,
+    MatProgressSpinnerModule,
     RouterModule
   ],
 })
-
 export class RegistrationComponent implements OnInit {
   registrationService = inject(RegistrationService);
+  accordion = viewChild.required(MatAccordion);
+  @ViewChild('stepper') stepper!: MatStepper;
   router = inject(Router);
   hidePassword = true;
   emailValidationError = '';
   registrationSucceeded = false;
   errors: string[] = [];
   industries: Industry[] = [];
+  selectedIndustry: string = '';
+  waitingForServerResponse: boolean = false;
+  registrationResult: string = "";
 
   companyDataFormGroup = this._formBuilder.group({
     companyName: ['', Validators.required],
@@ -57,7 +66,9 @@ export class RegistrationComponent implements OnInit {
     email: ['', Validators.email],
   });
 
-  summaryFormGroup = this._formBuilder.group({
+  summaryAndAgreementsGroup = this._formBuilder.group({
+    agreedToTOS: [false, Validators.requiredTrue],
+    agreedToPrivacyPolicy: [false, Validators.requiredTrue],
   });
 
   constructor(
@@ -67,6 +78,7 @@ export class RegistrationComponent implements OnInit {
 
   ngOnInit() {
     this.getIndustries();
+    this.accordion().openAll();
   }
 
   getIndustries() {
@@ -79,6 +91,11 @@ export class RegistrationComponent implements OnInit {
           console.error(error);
         }
     });
+  }
+
+  onIndustrySelectionChanged(value: any) {
+    this.selectedIndustry = this.industries
+      .find(i => i.id === value)?.industryName || '';
   }
 
   togglePasswordVisibility(event: MouseEvent) {
@@ -123,18 +140,23 @@ export class RegistrationComponent implements OnInit {
         ...this.companyDataFormGroup.value,
         ...this.userDataFormGroup.value
       } as User;
+      this.stepper.next();
+      this.waitingForServerResponse = true;
       this.registrationService.register(newUser)
         .forEach(
           response => {
             if (response) {
               this.registrationSucceeded = true;
-              this.showNotification("Registration succeeded", "Ok");
+              this.registrationResult = "Your registration has been successful";
             }
           }).catch(
             error => {
               this.registrationSucceeded = false;
+              this.registrationResult = "Registration failed";
               this.showErrorList(error);
-            });
+            }).then(() => {
+              this.waitingForServerResponse = false;
+            });          
     }
   }    
 }

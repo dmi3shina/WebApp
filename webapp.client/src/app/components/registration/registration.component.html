@@ -1,18 +1,18 @@
 <mat-stepper orientation="vertical" [linear]="true" #stepper>
   <mat-step [stepControl]="companyDataFormGroup" label="Fill out your company data">
     <form [formGroup]="companyDataFormGroup" class="vertical-container">
-        <mat-form-field>
-          <mat-label>Company name</mat-label>
-          <input matInput placeholder="Company name" formControlName="companyName" required>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Industry</mat-label>
-          <mat-select formControlName="industryId" required>
-            @for (industry of industries; track industry) {
-            <mat-option [value]="industry.id">{{industry.industryName}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+      <mat-form-field>
+        <mat-label>Company name</mat-label>
+        <input matInput placeholder="Company name" formControlName="companyName" required>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Industry</mat-label>
+        <mat-select formControlName="industryId" (selectionChange)="onIndustrySelectionChanged($event.value)" required>
+          @for (industry of industries; track industry) {
+          <mat-option [value]="industry.id">{{industry.industryName}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
       <div>
         <button mat-button matStepperNext>Next</button>
       </div>
@@ -48,7 +48,7 @@
         </button>
       </mat-form-field>
       <mat-form-field>
-        <mat-label>E-Mail</mat-label>
+        <mat-label>E-Mail (optional)</mat-label>
         <input matInput placeholder="ex.: user@domain.com" formControlName="email" (blur)="updateEmailValidationError()">
         @if (emailValidationError) {
         <mat-error>{{emailValidationError}}</mat-error>
@@ -61,24 +61,53 @@
     </form>
   </mat-step>
 
-  <mat-step [stepControl]="summaryFormGroup" label="Summary">
-    <form [formGroup]="summaryFormGroup">
-      <section class="summary-section">
-        <mat-checkbox class="checkbox-margin">I agree to terms of service</mat-checkbox>
-        <mat-checkbox class="checkbox-margin">I agree to privacy policy</mat-checkbox>
+  <mat-step [stepControl]="summaryAndAgreementsGroup" label="Summary">
+    <form [formGroup]="summaryAndAgreementsGroup" class="vertical-container">
+      <mat-accordion multi="true">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title> Company data </mat-panel-title>
+            <mat-panel-description>
+              Review your company data
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <p>Company name: {{companyDataFormGroup.value.companyName}}</p>
+          <p>Industry: {{selectedIndustry}}</p>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title> Personal data </mat-panel-title>
+            <mat-panel-description>
+              Review your personal data
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <p>First name: {{userDataFormGroup.value.firstName}}</p>
+          <p>Last name: {{userDataFormGroup.value.lastName}}</p>
+          <p>User name: {{userDataFormGroup.value.userName}}</p>
+          <p>E-Mail: {{userDataFormGroup.value.email || 'Not specified'}}</p>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <section class="checkboxes-section">
+        <mat-checkbox formControlName="agreedToTOS">I agree to terms of service</mat-checkbox>
+        <mat-checkbox formControlName="agreedToPrivacyPolicy">I agree to privacy policy</mat-checkbox>
       </section>
       <div>
         <button mat-button matStepperPrevious>Back</button>
-        <button (click)="registerUser()" mat-stroked-button color="accent">Register</button>
+        <button (click)="registerUser()"
+                [disabled]="!summaryAndAgreementsGroup.valid"
+                mat-stroked-button color="accent">
+          Register
+        </button>
       </div>
     </form>
   </mat-step>
 
   <mat-step label="Result">
-    <p>You are now done.</p>
-    <div>
-      <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="stepper.reset()">Reset</button>
-    </div>
+    @if (waitingForServerResponse) {
+    <mat-spinner></mat-spinner>
+    }
+    @else {
+      <p class="result">{{registrationResult}}</p>
+    }
   </mat-step>
 </mat-stepper>
