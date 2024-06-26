@@ -4,6 +4,9 @@
       <mat-form-field>
         <mat-label>Company name</mat-label>
         <input matInput placeholder="Company name" formControlName="companyName" required>
+        @if (companyDataFormGroup.get('companyName')?.hasError('required')) {
+        <mat-error>{{requiredError}}</mat-error>
+        }
       </mat-form-field>
       <mat-form-field>
         <mat-label>Industry</mat-label>
@@ -12,6 +15,9 @@
           <mat-option [value]="industry.id">{{industry.industryName}}</mat-option>
           }
         </mat-select>
+        @if (companyDataFormGroup.get('industryId')?.hasError('required') || companyDataFormGroup.get('industryId')?.hasError('min')) {
+        <mat-error>{{requiredError}}</mat-error>
+        }
       </mat-form-field>
       <div>
         <button mat-button matStepperNext>Next</button>
@@ -24,21 +30,36 @@
       <mat-form-field>
         <mat-label>First name</mat-label>
         <input matInput placeholder="First name" formControlName="firstName" required>
+        @if (userDataFormGroup.get('firstName')?.hasError('required')) {
+        <mat-error>{{requiredError}}</mat-error>
+        }
       </mat-form-field>
       <mat-form-field>
         <mat-label>Last name</mat-label>
         <input matInput placeholder="Last name" formControlName="lastName" required>
+        @if (userDataFormGroup.get('lastName')?.hasError('required')) {
+        <mat-error>{{requiredError}}</mat-error>
+        }
       </mat-form-field>
       <mat-form-field>
         <mat-label>User name</mat-label>
         <input matInput placeholder="Create a unique user name (login)" formControlName="userName" required>
+        @if (userDataFormGroup.get('userName')?.hasError('required')) {
+        <mat-error>{{requiredError}}</mat-error>
+        }
       </mat-form-field>
       <mat-form-field>
         <mat-label>Password</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" (blur)="updatePasswordValidationError()">
         <button mat-icon-button matSuffix (click)="togglePasswordVisibility($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
           <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
+        @if (userDataFormGroup.get('password')?.hasError('required')) {
+        <mat-error>{{requiredError}}</mat-error>
+        }
+        @if (passwordValidationError) {
+        <mat-error>{{passwordValidationError}}</mat-error>
+        }
       </mat-form-field>
       <mat-form-field>
         <mat-label>Password repetition</mat-label>
@@ -46,6 +67,12 @@
         <button mat-icon-button matSuffix (click)="togglePasswordVisibility($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
           <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
+        @if (userDataFormGroup.get('passwordRepetition')?.hasError('required')) {
+        <mat-error>{{requiredError}}</mat-error>
+        }
+        @if (userDataFormGroup.get('passwordRepetition')?.hasError('requiredIdentical')) {
+        <mat-error>Must be identical to the password</mat-error>
+        }
       </mat-form-field>
       <mat-form-field>
         <mat-label>E-Mail (optional)</mat-label>

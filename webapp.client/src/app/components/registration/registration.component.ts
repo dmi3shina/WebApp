@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, viewChild, ViewChild } from '@angular/core';
-import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, FormsModule, ReactiveFormsModule, ValidatorFn, AbstractControl } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
@@ -43,28 +43,35 @@ export class RegistrationComponent implements OnInit {
   accordion = viewChild.required(MatAccordion);
   @ViewChild('stepper') stepper!: MatStepper;
   router = inject(Router);
-  hidePassword = true;
-  emailValidationError = '';
-  registrationSucceeded = false;
+  hidePassword: boolean = true;
   errors: string[] = [];
   industries: Industry[] = [];
   selectedIndustry: string = '';
   waitingForServerResponse: boolean = false;
-  registrationResult: string = "";
+  registrationSucceeded: boolean = false;
+  registrationResult: string = '';
+  passwordValidationError: string = '';
+  emailValidationError: string = '';
+  requiredError: string = 'Required';
 
   companyDataFormGroup = this._formBuilder.group({
     companyName: ['', Validators.required],
-    industryId: [0, Validators.required],
+    industryId: [0, [Validators.required, Validators.min(1)]],
   });
 
   userDataFormGroup = this._formBuilder.group({
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
     userName: ['', Validators.required],
-    password: ['', Validators.required],
+    password: ['', [
+      Validators.required,
+      Validators.pattern('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&]).{6,}')]],
     passwordRepetition: ['', Validators.required],
     email: ['', Validators.email],
-  });
+  }, {
+    validators: this.requiredIdentical('passwordRepetition', 'password')
+  }
+  );
 
   summaryAndAgreementsGroup = this._formBuilder.group({
     agreedToTOS: [false, Validators.requiredTrue],
@@ -102,6 +109,34 @@ export class RegistrationComponent implements OnInit {
     this.hidePassword = !this.hidePassword;
     event.stopPropagation();
   }
+
+  updatePasswordValidationError() {
+    if (this.userDataFormGroup.get('password')?.hasError('pattern')) {
+      this.passwordValidationError = 'Password must be at least 6 characters and have at least one non alphanumeric character, one digit, one lowercase and one uppercase character';
+    } else {
+      this.passwordValidationError = '';
+    }
+  }
+
+  requiredIdentical(passwordRepetition: string, password: string): ValidatorFn {
+    return (abstractControl: AbstractControl) => {
+      const passwordRepetitionControl = abstractControl.get(passwordRepetition);
+      const passwordControl = abstractControl.get(password);
+
+      if (passwordRepetitionControl!.errors &&
+        !passwordRepetitionControl!.errors['requiredIdentical']) {
+        return null;
+      }
+      if (passwordControl!.value !== passwordRepetitionControl!.value) {
+        const error = { requiredIdentical: 'true' };
+        passwordRepetitionControl!.setErrors(error);
+        return error;
+      } else {
+        passwordRepetitionControl!.setErrors(null);
+        return null;
+      }
+    };
+  }  
 
   updateEmailValidationError() {
     if (this.userDataFormGroup.get('email')?.hasError('email')) {
