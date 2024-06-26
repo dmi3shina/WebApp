@@ -162,7 +162,7 @@ export class RegistrationComponent implements OnInit {
             for (let i = 0; i < errList.length; i++) {
               this.errors.push(errList[i]);
             }
-            this.showNotification(this.errors.join(" "), "Ok");
+            return this.errors.join(" ");
           }
         }
       }
@@ -182,13 +182,12 @@ export class RegistrationComponent implements OnInit {
           response => {
             if (response) {
               this.registrationSucceeded = true;
-              this.registrationResult = "Your registration has been successful";
+              this.registrationResult = "Your registration has been successful.";
             }
           }).catch(
             error => {
               this.registrationSucceeded = false;
-              this.registrationResult = "Registration failed";
-              this.showErrorList(error);
+              this.registrationResult = `Registration failed. Reason: ${this.showErrorList(error)}`;
             }).then(() => {
               this.waitingForServerResponse = false;
             });          
