@@ -1,14 +1,19 @@
+.inner-container {
+  margin: 64px auto;
+  min-width: 328px;
+  max-width: 943px;
+}
+
 .vertical-container {
   display: flex;
   flex-direction: column;
   margin-top: 16px;
-  min-width: 400px;
 }
+
 .checkboxes-section {
   margin: 16px;
 }
 
 .result {
   margin-top: 16px;
-  color: white;
 }

@@ -1,140 +1,142 @@
-<mat-stepper orientation="vertical" [linear]="true" #stepper>
-  <mat-step [stepControl]="companyDataFormGroup" label="Fill out your company data">
-    <form [formGroup]="companyDataFormGroup" class="vertical-container">
-      <mat-form-field>
-        <mat-label>Company name</mat-label>
-        <input matInput placeholder="Company name" formControlName="companyName" required>
-        @if (companyDataFormGroup.get('companyName')?.hasError('required')) {
-        <mat-error>{{requiredError}}</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Industry</mat-label>
-        <mat-select formControlName="industryId" (selectionChange)="onIndustrySelectionChanged($event.value)" required>
-          @for (industry of industries; track industry) {
-          <mat-option [value]="industry.id">{{industry.industryName}}</mat-option>
+<div class="inner-container">
+  <mat-stepper orientation="vertical" [linear]="true" #stepper>
+    <mat-step [stepControl]="companyDataFormGroup" label="Fill out your company data">
+      <form [formGroup]="companyDataFormGroup" class="vertical-container">
+        <mat-form-field>
+          <mat-label>Company name</mat-label>
+          <input matInput placeholder="Company name" formControlName="companyName" required>
+          @if (companyDataFormGroup.get('companyName')?.hasError('required')) {
+          <mat-error>{{requiredError}}</mat-error>
           }
-        </mat-select>
-        @if (companyDataFormGroup.get('industryId')?.hasError('required') || companyDataFormGroup.get('industryId')?.hasError('min')) {
-        <mat-error>{{requiredError}}</mat-error>
-        }
-      </mat-form-field>
-      <div>
-        <button mat-button matStepperNext>Next</button>
-      </div>
-    </form>
-  </mat-step>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Industry</mat-label>
+          <mat-select formControlName="industryId" (selectionChange)="onIndustrySelectionChanged($event.value)" required>
+            @for (industry of industries; track industry) {
+            <mat-option [value]="industry.id">{{industry.industryName}}</mat-option>
+            }
+          </mat-select>
+          @if (companyDataFormGroup.get('industryId')?.hasError('required') || companyDataFormGroup.get('industryId')?.hasError('min')) {
+          <mat-error>{{requiredError}}</mat-error>
+          }
+        </mat-form-field>
+        <div>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </form>
+    </mat-step>
 
-  <mat-step [stepControl]="userDataFormGroup" label="Fill out your personal data">
-    <form [formGroup]="userDataFormGroup" class="vertical-container">
-      <mat-form-field>
-        <mat-label>First name</mat-label>
-        <input matInput placeholder="First name" formControlName="firstName" required>
-        @if (userDataFormGroup.get('firstName')?.hasError('required')) {
-        <mat-error>{{requiredError}}</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Last name</mat-label>
-        <input matInput placeholder="Last name" formControlName="lastName" required>
-        @if (userDataFormGroup.get('lastName')?.hasError('required')) {
-        <mat-error>{{requiredError}}</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>User name</mat-label>
-        <input matInput placeholder="Create a unique user name (login)" formControlName="userName" required>
-        @if (userDataFormGroup.get('userName')?.hasError('required')) {
-        <mat-error>{{requiredError}}</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Password</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" (blur)="updatePasswordValidationError()">
-        <button mat-icon-button matSuffix (click)="togglePasswordVisibility($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
-          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-        </button>
-        @if (userDataFormGroup.get('password')?.hasError('required')) {
-        <mat-error>{{requiredError}}</mat-error>
-        }
-        @if (passwordValidationError) {
-        <mat-error>{{passwordValidationError}}</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Password repetition</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="passwordRepetition">
-        <button mat-icon-button matSuffix (click)="togglePasswordVisibility($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
-          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-        </button>
-        @if (userDataFormGroup.get('passwordRepetition')?.hasError('required')) {
-        <mat-error>{{requiredError}}</mat-error>
-        }
-        @if (userDataFormGroup.get('passwordRepetition')?.hasError('requiredIdentical')) {
-        <mat-error>Must be identical to the password</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>E-Mail (optional)</mat-label>
-        <input matInput placeholder="ex.: user@domain.com" formControlName="email" (blur)="updateEmailValidationError()">
-        @if (emailValidationError) {
-        <mat-error>{{emailValidationError}}</mat-error>
-        }
-      </mat-form-field>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
-      </div>
-    </form>
-  </mat-step>
+    <mat-step [stepControl]="userDataFormGroup" label="Fill out your personal data">
+      <form [formGroup]="userDataFormGroup" class="vertical-container">
+        <mat-form-field>
+          <mat-label>First name</mat-label>
+          <input matInput placeholder="First name" formControlName="firstName" required>
+          @if (userDataFormGroup.get('firstName')?.hasError('required')) {
+          <mat-error>{{requiredError}}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Last name</mat-label>
+          <input matInput placeholder="Last name" formControlName="lastName" required>
+          @if (userDataFormGroup.get('lastName')?.hasError('required')) {
+          <mat-error>{{requiredError}}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>User name</mat-label>
+          <input matInput placeholder="Create a unique user name (login)" formControlName="userName" required>
+          @if (userDataFormGroup.get('userName')?.hasError('required')) {
+          <mat-error>{{requiredError}}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" (blur)="updatePasswordValidationError()">
+          <button mat-icon-button matSuffix (click)="togglePasswordVisibility($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (userDataFormGroup.get('password')?.hasError('required')) {
+          <mat-error>{{requiredError}}</mat-error>
+          }
+          @if (passwordValidationError) {
+          <mat-error>{{passwordValidationError}}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Password repetition</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="passwordRepetition">
+          <button mat-icon-button matSuffix (click)="togglePasswordVisibility($event)" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (userDataFormGroup.get('passwordRepetition')?.hasError('required')) {
+          <mat-error>{{requiredError}}</mat-error>
+          }
+          @if (userDataFormGroup.get('passwordRepetition')?.hasError('requiredIdentical')) {
+          <mat-error>Must be identical to the password</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>E-Mail (optional)</mat-label>
+          <input matInput placeholder="ex.: user@domain.com" formControlName="email" (blur)="updateEmailValidationError()">
+          @if (emailValidationError) {
+          <mat-error>{{emailValidationError}}</mat-error>
+          }
+        </mat-form-field>
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-button matStepperNext>Next</button>
+        </div>
+      </form>
+    </mat-step>
 
-  <mat-step [stepControl]="summaryAndAgreementsGroup" label="Summary">
-    <form [formGroup]="summaryAndAgreementsGroup" class="vertical-container">
-      <mat-accordion multi="true">
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title> Company data </mat-panel-title>
-            <mat-panel-description>
-              Review your company data
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <p>Company name: {{companyDataFormGroup.value.companyName}}</p>
-          <p>Industry: {{selectedIndustry}}</p>
-        </mat-expansion-panel>
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title> Personal data </mat-panel-title>
-            <mat-panel-description>
-              Review your personal data
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <p>First name: {{userDataFormGroup.value.firstName}}</p>
-          <p>Last name: {{userDataFormGroup.value.lastName}}</p>
-          <p>User name: {{userDataFormGroup.value.userName}}</p>
-          <p>E-Mail: {{userDataFormGroup.value.email || 'Not specified'}}</p>
-        </mat-expansion-panel>
-      </mat-accordion>
-      <section class="checkboxes-section">
-        <mat-checkbox formControlName="agreedToTOS">I agree to terms of service</mat-checkbox>
-        <mat-checkbox formControlName="agreedToPrivacyPolicy">I agree to privacy policy</mat-checkbox>
-      </section>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button (click)="registerUser()"
-                [disabled]="!summaryAndAgreementsGroup.valid"
-                mat-stroked-button color="accent">
-          Register
-        </button>
-      </div>
-    </form>
-  </mat-step>
+    <mat-step [stepControl]="summaryAndAgreementsGroup" label="Summary">
+      <form [formGroup]="summaryAndAgreementsGroup" class="vertical-container">
+        <mat-accordion multi="true">
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Company data </mat-panel-title>
+              <mat-panel-description>
+                Review your company data
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>Company name: {{companyDataFormGroup.value.companyName}}</p>
+            <p>Industry: {{selectedIndustry}}</p>
+          </mat-expansion-panel>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Personal data </mat-panel-title>
+              <mat-panel-description>
+                Review your personal data
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>First name: {{userDataFormGroup.value.firstName}}</p>
+            <p>Last name: {{userDataFormGroup.value.lastName}}</p>
+            <p>User name: {{userDataFormGroup.value.userName}}</p>
+            <p>E-Mail: {{userDataFormGroup.value.email || 'Not specified'}}</p>
+          </mat-expansion-panel>
+        </mat-accordion>
+        <section class="checkboxes-section">
+          <mat-checkbox formControlName="agreedToTOS">I agree to terms of service</mat-checkbox>
+          <mat-checkbox formControlName="agreedToPrivacyPolicy">I agree to privacy policy</mat-checkbox>
+        </section>
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button (click)="registerUser()"
+                  [disabled]="!summaryAndAgreementsGroup.valid"
+                  mat-flat-button color="accent">
+            Register
+          </button>
+        </div>
+      </form>
+    </mat-step>
 
-  <mat-step label="Result">
-    @if (waitingForServerResponse) {
-    <mat-spinner></mat-spinner>
-    }
-    @else {
+    <mat-step label="Result">
+      @if (waitingForServerResponse) {
+      <mat-spinner [diameter]="32"></mat-spinner>
+      }
+      @else {
       <p class="result">{{registrationResult}}</p>
-    }
-  </mat-step>
-</mat-stepper>
+      }
+    </mat-step>
+  </mat-stepper>
+</div>
